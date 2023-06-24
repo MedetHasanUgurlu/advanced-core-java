@@ -53,6 +53,12 @@ Another way is autoboxing, which allows the programmer to mix primitive and boxe
 <img src="img_7.png">
 </div>
 
+
+## [ITEM-7] Eliminate obsolete object reference.
+
+
+
+
 ## [ITEM-9] Prefer try-with-resources to try-finally
 
 With java7 try-with-resource statement is more effective than other statements. However, resource must be implemented the AutoCloseable.
