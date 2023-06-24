@@ -1,2 +1,6 @@
-package org.medron;public class CreatingObjectAndDestroyingObject {
+package org.medron;
+
+public class CreatingObjectAndDestroyingObject {
+
+
 }
