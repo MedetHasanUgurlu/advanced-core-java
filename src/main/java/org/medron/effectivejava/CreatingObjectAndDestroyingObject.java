@@ -1,9 +1,6 @@
-package org.medron.pack1;
+package org.medron.effectivejava;
 
-import javax.lang.model.util.Types;
 import java.io.*;
-import java.util.Collection;
-import java.util.Collections;
 
 @SuppressWarnings({"java:S1128","java:S1144","java:S1128","java:S1128","java:S1186","java:S1128"})
 public class CreatingObjectAndDestroyingObject {
