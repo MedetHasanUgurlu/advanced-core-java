@@ -121,7 +121,26 @@ them after the compilation is complete.
 > A **Diagnostic** object contains information about the problem location
 (including file name, line number, and column number) as well as a human-readable description.
 
-Page 663
+### Reading Source Files from Memory
+If you generate source code on the fly, you can have it compiled from
+memory, without having to save files to disk.
+
+    public class StringSource extends SimpleJavaFileObject{
+        private String code;
+        StringSource(String name, String code){
+            super(URI.create("string:///" + name.replace('.','/') +
+            ".java"), Kind.SOURCE);
+            this.code = code;
+        }
+        public CharSequence getCharContent(boolean ignoreEncodingErrors){
+            return code;
+        }
+    }
+
+Then generate the code for your classes and give the compiler a list of StringSource objects:
+
+    List<StringSource> sources = List.of(new StringSource(className1, class1CodeString), . . .);
+    task = compiler.getTask(null, fileManager, diagnostics, null,null, sources);
 
 
 
