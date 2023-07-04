@@ -1,6 +1,6 @@
-# CORE JAVA VOLUME-2
 
-## Chapter-3 XML
+
+# Chapter-3 XML
 
 <div align="center">
 <img src="img.png">
@@ -18,7 +18,31 @@ so it has never caught on in a big way. XML was designed as a
 simplified version of SGML for use on the Internet.
 
 
-### Parsing an XML Document.
+##
+
+
+
+
+
+
+
+Parsing an XML Document.
 
 Java Library supplies two kinds of XML parsers.
-1- DOM(Document Object Model)
+1- DOM(Document Object Model) Tree Structure
+2- XML (SAX) Streaming Parsers
+
+DOM parser standardized by World Wide Web Consortium (w3c).
+
+<div align="center">
+<img src="img_2.png">
+</div>
+ You can parse file URL, file and input stream.
+
+
+A document object is an in-memory representation of the tree structure of an XML document.
+It is composed of objects whose classes implement the Node interface and its various subinterfaces.
+
+<div align="center">
+<img src="img_1.png">
+</div>
