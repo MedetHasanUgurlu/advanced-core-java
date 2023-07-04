@@ -142,10 +142,22 @@ Then generate the code for your classes and give the compiler a list of StringSo
     List<StringSource> sources = List.of(new StringSource(className1, class1CodeString), . . .);
     task = compiler.getTask(null, fileManager, diagnostics, null,null, sources);
 
+# Using Annotations
+Annotations are tags that you insert into your source code so that some tool
+can process them.
+
+Annotations do not change the way in which your programs are compiled.
+
+The Java compiler generates the same virtual machine instructions with or
+without the annotations.
+
+To benefit from annotations, you need to select a processing tool. Use
+annotations that your processing tool understands, then apply the processing
+tool to your code.
+
+## An Introduction into Annotations
 
 
-
-    
 
     
 
