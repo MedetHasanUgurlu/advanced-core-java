@@ -142,7 +142,7 @@ Then generate the code for your classes and give the compiler a list of StringSo
     List<StringSource> sources = List.of(new StringSource(className1, class1CodeString), . . .);
     task = compiler.getTask(null, fileManager, diagnostics, null,null, sources);
 
-# Using Annotations
+## Using Annotations
 Annotations are tags that you insert into your source code so that some tool
 can process them.
 
@@ -155,7 +155,206 @@ To benefit from annotations, you need to select a processing tool. Use
 annotations that your processing tool understands, then apply the processing
 tool to your code.
 
-## An Introduction into Annotations
+## Annotation Syntax
+
+### Annotation Interfaces
+    modifiers @interface AnnotationName{
+        elementDecleration1
+        elementDecleration2
+    }
+
+> All annotation interfaces implicitly extend the
+java.lang.annotation.Annotation inter-face.
+
+The type of annotation element is one of the following:
+* A primitive type (int, short, long, byte, char, double, float, or boolean)
+* String
+* Class (with an optional type parameter such as Class<? extends MyClass>)
+* An enum type
+* An annotation type
+* An array of the preceding types (an array of arrays is not a legal element type)
+
+
+    public @interface BugReport{
+        enum Status { UNCONFIRMED, CONFIRMED, FIXED, NOTABUG };
+        boolean showStopper() default false;
+        String assignedTo() default "[none]";
+        Class<?> testCase() default Void.class;
+        Status status() default Status.UNCONFIRMED;
+        Reference ref() default @Reference(); // an annotation type
+        String[] reportedBy();
+    }
+
+## Annotations
+
+The Format should be on the below.
+    
+    @AnnotationName(elementName1=value1, elementName2=value2, . . .)
+
+    @BugReport(assignedTo="Harry",severity=10)
+    @BugReport(severity=10) by default value assignedTo=none
+
+> Defaults are not stored with the annotation; instead, they are dynamically
+computed. For example, if you change the default for the assignedTo
+element to "[]" and recompile the BugReport interface, the
+annotation @BugReport(severity=10) will use the new default,
+even in class files that have not been recompiled after the default
+changed.
+
+**Single-value Annotations**
+
+    public @interface ActionListenerFor{
+        String value();
+    }
+
+Using it with value or not the same.
+
+    @ActionListenerFor("Yellow Button") === @ActionListenerFor(value="Yellow Button")
+
+> An annotation element can never be set to null. We need to find other defaults such as "" or Void.class.
+
+
+## Standard Annotations
+### Meta-Annotations
+
+
+The **@Target** meta-annotation is applied to an annotation, restricting the
+items to which the annotation applies.
+
+The **@Retention** meta-annotation specifies how long an annotation is
+retained.
+
+<div align="center">
+<img src="img_1.png">
+</div>
+
+Suppose you define an inherited annotation **@Persistent** to indicate that
+objects of a class can be saved in a database. Then the subclasses of
+persistent classes are automatically annotated as persistent.
+
+    @Inherited @interface Persistent { }
+    @Persistent class Employee { . . . }
+    class Manager extends Employee { . . . } // also @Persistent
+
+
+As of Java 8, it is legal to apply the same annotation type multiple times to
+an item. For backward compatibility, the implementor of a repeatable
+annotation needs to provide a container annotation that holds the repeated
+annotations in an array.
+
+    @Repeatable(TestCases.class)
+    @interface TestCase{
+        String params();
+        String expected();
+    }
+    
+    
+    @interface TestCases{
+        TestCase[] value();
+    }
+
+> Whenever the user supplies two or more @TestCase annotations, they are
+automatically wrapped into a @TestCases annotation.
+
+## Source-Level Annotation Processing
+Another use for annotation is the automatic processing of source
+files to _produce more source code, configuration files, scripts_, or _whatever
+else_ one might want to generate.
+
+### Annotation Processors
+Annotation processing is integrated into the Java compiler. During
+compilation, you can invoke annotation processors by running
+
+    javac -processor ProcessorClassName1,ProcessorClassName2,. . .sourceFiles
+
+> An annotation processor can only generate new source files. It cannot
+modify an existing source file.
+
+An annotation processor implements the Processor interface, generally
+by extending the AbstractProcessor class. You need to specify which
+annotations your processor supports.
+
+    @SupportedAnnotationTypes("com.horstmann.annotations.ToString")
+    @SupportedSourceVersion(SourceVersion.RELEASE_8)
+    public class ToStringAnnotationProcessor extends AbstractProcessor{
+        public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment currentRound){
+            . . .
+        }
+    }
+
+### Using Annotations to Generate Source Code
+
+We can’t put these methods into the
+original classes—annotation processors can only produce new classes, not
+modify existing ones.
+
+    public class ToStrings{
+        public static String toString(Point obj){
+            Generated code
+        }
+        public static String toString(Rectangle obj){
+            Generated code
+        }
+        . . .
+        public static String toString(Object obj){
+            return Objects.toString(obj);
+        }
+    }
+
+We don’t want to use reflection, so we annotate accessor methods, not fields.
+
+    @ToString
+    public class Rectangle{
+        . . .
+        @ToString(includeName=false) 
+        public Point getTopLeft() {
+            return topLeft; 
+        }
+        @ToString 
+        public int getWidth() {
+            return width;
+        }
+        @ToString 
+        public int getHeight() {
+            return height;
+        }
+    }
+
+The annotation processor should then generate the following source code.
+
+    public static String toString(Rectangle obj) {
+        var result = new StringBuilder();
+        result.append("Rectangle");
+        result.append("[");
+        result.append(toString(obj.getTopLeft()));
+        result.append(",");
+        result.append("width=");
+        result.append(toString(obj.getWidth()));
+        result.append(",");
+        result.append("height=");
+        result.append(toString(obj.getHeight()));
+        result.append("]");
+        return result.toString();
+    }
+
+Here is an outline of the method that produces the toString method for a class with a given TypeElement.
+
+    private void writeToStringMethod(PrintWriter out, TypeElement te){
+        String className = te.getQualifiedName().toString();
+        // Print method header and declaration of string builder
+        ToString ann = te.getAnnotation(ToString.class);
+        if (ann.includeName())
+        // Print code to add class name
+        for (Element c : te.getEnclosedElements()){
+            ann = c.getAnnotation(ToString.class);
+        if (ann != null){
+        if (ann.includeName()) 
+        // Print code to add field name
+    Print code to append toString(obj.methodName())
+    }
+    }
+    Print code to return string
+    }
 
 
 
